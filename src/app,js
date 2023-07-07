@@ -1,0 +1,110 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
+import { Container, Typography, Card, CardContent, Button, TextField } from '@mui/material';
+import { Edit, Delete } from '@mui/icons-material';
+import { styled } from '@mui/system';
+
+const CardContainer = styled(Card)`
+  margin-bottom: 16px;
+  background-color: #f5f5f5;
+`;
+
+const CardTitle = styled(Typography)`
+  font-size: 1.2rem;
+  font-weight: bold;
+`;
+
+const CardText = styled(Typography)`
+  color: #555555;
+`;
+
+const EditPage = () => {
+  const [editedItem, setEditedItem] = useState('');
+
+  const handleInputChange = (event) => {
+    setEditedItem(event.target.value);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    // Perform the API update or submit logic here
+    // You can use the editedItem state and the item ID (from the URL parameter) to update the corresponding item in your backend
+
+    // Reset the editedItem state and show a success message, redirect, or perform any other action as needed
+    setEditedItem('');
+    // Add your logic for showing a success message, redirecting, or performing other actions
+  };
+
+  return (
+    <Container maxWidth="md" style={{ marginTop: '16px' }}>
+      <Typography variant="h4" component="h1" align="center" gutterBottom>
+        Edit Page
+      </Typography>
+      <form onSubmit={handleSubmit}>
+        <TextField
+          label="Edited Item"
+          value={editedItem}
+          onChange={handleInputChange}
+          variant="outlined"
+          margin="normal"
+          fullWidth
+        />
+        <Button type="submit" variant="contained" color="primary">
+          Update
+        </Button>
+      </form>
+    </Container>
+  );
+};
+
+const App = () => {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get('https://api.gyanibooks.com/library/get_dummy_notes/') // Replace with your API endpoint URL
+      .then((response) => {
+        setData(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
+
+  return (
+    <Router>
+      <Container maxWidth="md" style={{ marginTop: '16px' }}>
+        <Typography variant="h4" component="h1" align="center" gutterBottom>
+          Data from API
+        </Typography>
+        {data.map((item) => (
+          <CardContainer key={item.id}>
+            <Card>
+              <CardContent>
+                <CardTitle variant="h6" component="h2">
+                  {item.title}
+                </CardTitle>
+                <CardText variant="body1" component="div">
+                  {item.description}
+                </CardText>
+                <Button startIcon={<Edit />} variant="contained" style={{ marginRight: '8px' }}>
+                  <Link to={`/edit/${item.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    Edit
+                  </Link>
+                </Button>
+                <Button startIcon={<Delete />} variant="contained" color="error">
+                  Delete
+                </Button>
+              </CardContent>
+            </Card>
+          </CardContainer>
+        ))}
+        
+      </Container>
+    </Router>
+  );
+};
+
+export default App;
